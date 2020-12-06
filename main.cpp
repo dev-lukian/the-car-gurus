@@ -16,18 +16,98 @@ struct Vehicle{
     int Odometer;
     int Year;
     int Price;
-    int Rank;
+    int Rank = 0;
 
 };
 
 Vehicle::Vehicle(const string &make, const string &model, const string &transmission, const string &color, const string &engineType, const string &bodyTape, int Odometer, int Year, int price):
 make(make), model(model), transmission(transmission), color(color), engine_type(engineType), body_tape(bodyTape), Odometer(Odometer),Year(Year),Price(Price) {}
 
-vector<Vehicle> merge(vector<Vehicle> left, vector<Vehicle> right)
+void merge(vector<Vehicle> listings, int size, int low, int middle, int high, string criteria)
 {
-    vector<Vehicle> result;
+    {
+        vector<Vehicle> temp(size);
+        for(int i = low; i <= high; i++){
+            temp[i] = listings[i];
+        }
+        int i = low;
+        int j = middle+1;
+        int k = low;
+        if(criteria == "Price") {
+            while (i <= middle && j <= high){
+                if(temp[i].Price <= temp[j].Price){
+                    listings[k] = temp[i];
+                    ++i;
+                }
+                else {
+                    listings[k] = temp[j];
+                    ++j;
+                }
+                ++k;
+            }
+            while (i <= middle){
+                listings[k] = temp[i];
+                ++k;
+                ++i;
+            }
+        }
+        if(criteria == "Odometer") {
+            while (i <= middle && j <= high){
+                if(temp[i].Odometer <= temp[j].Odometer){
+                    listings[k] = temp[i];
+                    ++i;
+                }
+                else {
+                    listings[k] = temp[j];
+                    ++j;
+                }
+                ++k;
+            }
+            while (i <= middle){
+                listings[k] = temp[i];
+                ++k;
+                ++i;
+            }
+        }
+        if(criteria == "Year") {
+            while (i <= middle && j <= high){
+                if(temp[i].Year <= temp[j].Year){
+                    listings[k] = temp[i];
+                    ++i;
+                }
+                else {
+                    listings[k] = temp[j];
+                    ++j;
+                }
+                ++k;
+            }
+            while (i <= middle){
+                listings[k] = temp[i];
+                ++k;
+                ++i;
+            }
+        }
+        if(criteria == "Rank") {
+            while (i <= middle && j <= high){
+                if(temp[i].Rank <= temp[j].Rank){
+                    listings[k] = temp[i];
+                    ++i;
+                }
+                else {
+                    listings[k] = temp[j];
+                    ++j;
+                }
+                ++k;
+            }
+            while (i <= middle){
+                listings[k] = temp[i];
+                ++k;
+                ++i;
+            }
+        }
 
-    return result;
+
+    }
 }
 void swap(Vehicle* a, Vehicle* b){
     Vehicle temp = *a;
@@ -69,6 +149,35 @@ void quickSort(vector<Vehicle> listings, int low, int high, string criteria){
         int indx = pivotSwap(listings, low, high, criteria);
         quickSort(listings,low,indx-1,criteria);
         quickSort(listings,indx+1,high,criteria);
+    }
+}
+void mergeSort(vector<Vehicle> listings, int size, int low, int high, string criteria){
+    if( low < high){
+        int middle = (low + high)/ 2;
+        mergeSort(listings, size, low, middle, criteria);
+        mergeSort(listings,size, middle+1, high, criteria);
+       // merge(listings, size,low,middle,high, criteria);
+    }
+}
+void updateRank(vector<Vehicle> listings, int multiplier){
+    int rank;
+    int size = listings.size();
+    for(int i = 0; i < size; i++){
+        if(i < size*0.01){
+            listings[i].Rank  += 5 * multiplier;
+        }
+        else if(i > size*0.01 && i <  size*0.05){
+            listings[i].Rank  += 4 * multiplier;
+        }
+        else if(i > size*0.05 && i <  size*0.1){
+            listings[i].Rank  += 3 * multiplier;
+        }
+        else if(i > size*0.1 && i <  size*0.25){
+            listings[i].Rank  += 2 * multiplier;
+        }
+        else {
+            listings[i].Rank += 1 * multiplier;
+        }
     }
 }
 
