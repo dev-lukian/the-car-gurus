@@ -14,13 +14,13 @@ using namespace std;
 void readFile(string outFile, vector<Vehicle*>& listings);
 
 // Helper functions for sorting algos
-void merge(vector<Vehicle*>& listings, int size, int low, int middle, int high, string criteria);
+void merge(vector<Vehicle*>& listings, int l, int m, int r, string criteria);
 void swap(Vehicle* a, Vehicle* b);
 int pivotSwap (vector<Vehicle*>& listings, int low, int high, string criteria);
 
 // Sorting algos
 void quickSort(vector<Vehicle*>& listings, int low, int high, string criteria);
-void mergeSort(vector<Vehicle*>& listings, int size, int low, int high, string criteria);
+void mergeSort(vector<Vehicle*>& listings, int low, int high, string criteria);
 
 // Assign car guru rating to eacg vehicle objects
 void updateRank(vector<Vehicle*>& listings, int multiplier);
@@ -135,7 +135,7 @@ int main() {
 
             // Sorting algorithm is run 4 times, once for each priority, and ranks are updated after each go
             for (int i = 0; i < 4; i++) {
-                mergeSort(listings, numOfCars, 0, numOfCars - 1, priority[i]);
+                mergeSort(listings, 0, numOfCars - 1, priority[i]);
                 updateRank(listings, 4 - i);
                 string percentageComplete = to_string((i + 1) * 20) + " Percent Complete....";
                 mvprintw(0, 0, percentageComplete.c_str());
@@ -143,7 +143,7 @@ int main() {
             }
 
             // Vehicle vector is sorted last by their calculated "Car Guru" rank
-            mergeSort(listings, numOfCars, 0, numOfCars - 1, "Rank");
+            mergeSort(listings, 0, numOfCars - 1, "Rank");
             mvprintw(0, 0, "100 Percent Complete....");
             wrefresh(main);
 
@@ -280,100 +280,145 @@ void readFile(string outFile, vector<Vehicle*>& listings) {
     }
     file.close();
 }
-void merge(vector<Vehicle*>& listings, int size, int low, int middle, int high, string criteria) {
-    vector<Vehicle*> temp(size);
-    for (int i = low; i <= high; i++) {
-        temp[i] = listings[i];
-    }
-    int i = low;
-    int j = middle + 1;
-    int k = low;
-    if (criteria == "Price") {
-        while (i <= middle && j <= high) {
-            if (temp[i]->Price <= temp[j]->Price) {
-                listings[k] = temp[i];
-                ++i;
-            } else {
-                listings[k] = temp[j];
-                ++j;
+
+void merge(vector<Vehicle*>& listings, int l, int m, int r, string criteria)
+{
+    int n1 = m - l + 1;
+    int n2 = r - m;
+
+    vector <Vehicle*> L(n1);
+    vector <Vehicle*> R(n2);
+
+    for (int i = 0; i < n1; i++)
+        L[i] = listings[l + i];
+    for (int j = 0; j < n2; j++)
+        R[j] = listings[m + 1 + j];
+
+    int i = 0;
+    int j = 0;
+    int k = l;
+    if(criteria == "Price") {
+        while (i < n1 && j < n2) {
+            if (L[i]->Price <= R[j]->Price) {
+                listings[k] = L[i];
+                i++;
             }
-            ++k;
-        }
-        while (i <= middle) {
-            listings[k] = temp[i];
-            ++k;
-            ++i;
-        }
-    }
-    if (criteria == "Odometer") {
-        while (i <= middle && j <= high) {
-            if (temp[i]->Odometer <= temp[j]->Odometer) {
-                listings[k] = temp[i];
-                ++i;
-            } else {
-                listings[k] = temp[j];
-                ++j;
+            else {
+                listings[k] = R[j];
+                j++;
             }
-            ++k;
+            k++;
         }
-        while (i <= middle) {
-            listings[k] = temp[i];
-            ++k;
-            ++i;
+        while (i < n1) {
+            listings[k] = L[i];
+            i++;
+            k++;
+        }
+        while (j < n2) {
+            listings[k] = R[j];
+            j++;
+            k++;
         }
     }
-    if (criteria == "Year") {
-        while (i <= middle && j <= high) {
-            if (temp[i]->Year >= temp[j]->Year) {
-                listings[k] = temp[i];
-                ++i;
-            } else {
-                listings[k] = temp[j];
-                ++j;
+    if(criteria == "Odometer"){
+        while (i < n1 && j < n2) {
+            if (L[i]->Odometer <= R[j]->Odometer) {
+                listings[k] = L[i];
+                i++;
             }
-            ++k;
+            else {
+                listings[k] = R[j];
+                j++;
+            }
+            k++;
         }
-        while (i <= middle) {
-            listings[k] = temp[i];
-            ++k;
-            ++i;
+        while (i < n1) {
+            listings[k] = L[i];
+            i++;
+            k++;
+        }
+        while (j < n2) {
+            listings[k] = R[j];
+            j++;
+            k++;
         }
     }
-    if (criteria == "Reliability") {
-        while (i <= middle && j <= high) {
-            if (temp[i]->Reliability >= temp[j]->Reliability) {
-                listings[k] = temp[i];
-                ++i;
-            } else {
-                listings[k] = temp[j];
-                ++j;
+    if(criteria == "Year")
+    {
+        while (i < n1 && j < n2) {
+            if (L[i]->Year >= R[j]->Year) {
+                listings[k] = L[i];
+                i++;
             }
-            ++k;
+            else {
+                listings[k] = R[j];
+                j++;
+            }
+            k++;
         }
-        while (i <= middle) {
-            listings[k] = temp[i];
-            ++k;
-            ++i;
+        while (i < n1) {
+            listings[k] = L[i];
+            i++;
+            k++;
+        }
+        // Copy the remaining elements of
+        // R[], if there are any
+        while (j < n2) {
+            listings[k] = R[j];
+            j++;
+            k++;
         }
     }
-    if (criteria == "Rank") {
-        while (i <= middle && j <= high) {
-            if (temp[i]->Rank >= temp[j]->Rank) {
-                listings[k] = temp[i];
-                ++i;
-            } else {
-                listings[k] = temp[j];
-                ++j;
+    if(criteria == "Reliability")
+    {
+        while (i < n1 && j < n2) {
+            if (L[i]->Reliability >= R[j]->Reliability) {
+                listings[k] = L[i];
+                i++;
             }
-            ++k;
+            else {
+                listings[k] = R[j];
+                j++;
+            }
+            k++;
         }
-        while (i <= middle) {
-            listings[k] = temp[i];
-            ++k;
-            ++i;
+        while (i < n1) {
+            listings[k] = L[i];
+            i++;
+            k++;
+        }
+        while (j < n2) {
+            listings[k] = R[j];
+            j++;
+            k++;
+        }
+    }
+    if(criteria == "Rank")
+    {
+        while (i < n1 && j < n2) {
+            if (L[i]->Rank >= R[j]->Rank) {
+                listings[k] = L[i];
+                i++;
+            }
+            else {
+                listings[k] = R[j];
+                j++;
+            }
+            k++;
+        }
+        while (i < n1) {
+            listings[k] = L[i];
+            i++;
+            k++;
+        }
+        while (j < n2) {
+            listings[k] = R[j];
+            j++;
+            k++;
         }
     }
 }
+
 void swap(Vehicle* a, Vehicle* b){
     Vehicle temp = *a;
     *a = *b;
@@ -421,13 +466,15 @@ void quickSort(vector<Vehicle*>& listings, int low, int high, string criteria){
         quickSort(listings,indx+1,high,criteria);
     }
 }
-void mergeSort(vector<Vehicle*>& listings, int size, int low, int high, string criteria){
-    if( low < high){
-        int middle = (low + high)/ 2;
-        mergeSort(listings, size, low, middle, criteria);
-        mergeSort(listings,size, middle+1, high, criteria);
-        merge(listings, size,low,middle,high, criteria);
+
+void mergeSort(vector<Vehicle*>& listings, int low, int high, string criteria){
+    if(low>=high){
+        return;
     }
+    int m = (low+high-1) / 2;
+    mergeSort(listings, low, m, criteria);
+    mergeSort(listings,m+1, high, criteria);
+    merge(listings, low, m, high, criteria);
 }
 void updateRank(vector<Vehicle*>& listings, int multiplier){
     int size = listings.size();
