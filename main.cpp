@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 using namespace std;
@@ -179,6 +180,32 @@ void updateRank(vector<Vehicle> listings, int multiplier){
             listings[i].Rank += 1 * multiplier;
         }
     }
+}
+vector<Vehicle> readFile(string outFile, Vehicle &data)
+{
+    ifstream file;
+    file.open(outFile);
+    vector<Vehicle> listings;
+    if(file.is_open())
+    {
+        string make = getline(file, make, ',');
+        string model = getline(file, model, ',');
+        string transmission = getline(file, transmission, ',');
+        string color = getline(file, color, ',');
+        string odometer = getline(file, odometer, ',');
+        string year = getline(file, year, ',');
+        string temp = getline(file, temp, ','); //engine type is in the file twice so this is eating up the extra one, won't get used
+        string engine_type = getline(file, engine_type, ',');
+        string body_type = getline(file, body_type, ',');
+        string temp2 = getline(file, temp2, ','); //same thing as before, but for drivetrain
+        string price = getline(file, price, ',');
+        string temp3 getline(file, temp3); //again for the reliability rating + end line
+        
+        Vehicle car = Vehicle(make, model, transmission, color, engine_type, body_type, stoi(odometer), stoi(year), stoi(price));
+        listings.push_back(car);
+    }
+    file.close();
+    return listings;
 }
 
 int main() {
