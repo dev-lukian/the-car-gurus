@@ -222,7 +222,7 @@ int displayMenu(vector<string>& choices, int highlight, int y, WINDOW* window);
 int main() {
     // Curses initialization
     WINDOW *main = initscr();
-    keypad(main, true);
+    keypad(main, TRUE);
     cbreak();
 
     // Get screen size
@@ -231,14 +231,13 @@ int main() {
 
     // Creates 2nd window
     WINDOW *inputWin = newwin(8, 80, 11, 0);
-    keypad(inputWin, true);
+    keypad(inputWin, TRUE);
+    scrollok(inputWin, TRUE);
 
     vector<string> choices;
     vector<string> priority;
     vector<Vehicle*> listings;
     readFile("./cars.csv", listings);
-    printw(to_string(listings.size()).c_str());
-    getch();
     int numOfCars = listings.size();
     int numOfPrintedCars;
     bool prioritySet = false;
@@ -289,19 +288,19 @@ int main() {
     choices.emplace_back("1. Merge Sort");
     choices.emplace_back("2. Quick Sort");
     userOption = displayMenu(choices, userOption, 1, main);
-    string test = to_string(userOption);
-    mvprintw(10, 0, test.c_str());
 
     while(true) {
         try {
-            mvprintw(4, 0, "What is the number of potential cars you want to return (Max 100)? ");
+            mvprintw(4, 0, "What is the number of potential cars you want to return (Max 50)? ");
             char input[3];
             clrtoeol();
             getnstr(input, 3);
             numOfPrintedCars = stoi(input);
-            if (numOfPrintedCars < 1 || numOfPrintedCars > 100) {
+            if (numOfPrintedCars < 1 || numOfPrintedCars > 50) {
                 throw invalid_argument("That is an invalid number. Please try again.");
             } else {
+                printw("Processing has begun...");
+                wrefresh(main);
                 break;
             }
         }
@@ -313,32 +312,42 @@ int main() {
         }
     }
 
-    clear();
-
     if(userOption == 0) {
-        auto time = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::high_resolution_clock::now();
         for(int i = 0; i < 4; i++) {
-            mergeSort(listings, numOfCars, 0, numOfCars-1, priority[i]);
+            mergeSort(listings, numOfCars, 0, numOfCars - 1, priority[i]);
             updateRank(listings, 4 - i);
+            string percentageComplete = to_string((i+1)*20) + " Percent Complete.";
+            mvprintw(5, 0, percentageComplete.c_str());
+            wrefresh(main);
         }
-        int64_t timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(time.time_since_epoch()).count();
+        mergeSort(listings, numOfCars, 0, numOfCars - 1, "Rank");
+        mvprintw(5, 0, "100 Percent Complete.");
+        wrefresh(main);
+        auto finish = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed = finish - start;
+        clear();
 
-        mergeSort(listings, numOfCars, 0, numOfCars-1, "Rank");
-
-        string title = "Using the merge sort alogirthm, your list of potential cars was generated in " + to_string(timestamp);
+        string title = "Using the merge sort alogirthm, your list of potential cars was generated in " + to_string(elapsed.count()) + " seconds";
         printw(title.c_str());
     }
     else if(userOption == 1) {
-        auto time = std::chrono::high_resolution_clock::now();
+        auto start = std::chrono::high_resolution_clock::now();
         for(int i = 0; i < 4; i++) {
             quickSort(listings, 0, numOfCars - 1, priority[i]);
             updateRank(listings, 4 - i);
+            string percentageComplete = to_string((i+1)*20) + "Percent Complete.";
+            mvprintw(5, 0, percentageComplete.c_str());
+            wrefresh(main);
         }
-        int64_t timestamp = std::chrono::duration_cast<std::chrono::nanoseconds>(time.time_since_epoch()).count();
-
         quickSort(listings, 0, numOfCars - 1, "Rank");
+        mvprintw(5, 0, "100 Percent Complete.");
+        wrefresh(main);
+        auto finish = std::chrono::high_resolution_clock::now();
+        auto elapsed = finish - start;
+        clear();
 
-        string title = "Using the quick sort alogirthm, your list of potential cars was generated in " + to_string(timestamp);
+        string title = "Using the quick sort alogirthm, your list of potential cars was generated in " + to_string(elapsed.count()) + " seconds";
         printw(title.c_str());
     }
 
