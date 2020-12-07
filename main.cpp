@@ -226,6 +226,10 @@ int main() {
             clear();
             prioritySet = false;
             priority.clear();
+            // Reset rank
+            for(int i = 0; i < numOfCars; i++) {
+                listings[i]->Rank = 0;
+            }
             continue;
         }
         else if(userOption == 1) {
