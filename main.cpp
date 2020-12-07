@@ -275,7 +275,6 @@ void readFile(string outFile, vector<Vehicle*>& listings) {
         listings.push_back(car);
     }
     file.close();
-    return listings;
 }
 void merge(vector<Vehicle*>& listings, int size, int low, int middle, int high, string criteria) {
     vector<Vehicle*> temp(size);
