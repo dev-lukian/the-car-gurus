@@ -6,3 +6,7 @@
 ** Make Sure the terminal screen is full screen **
 4) Once in the folder, type `make`
 5) After compilation, run the executable by typing `./car.out`
+
+
+Youtube Demo:
+https://youtu.be/vxenJYjqTJs
